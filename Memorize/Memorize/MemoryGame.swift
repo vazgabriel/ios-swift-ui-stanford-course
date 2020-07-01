@@ -8,13 +8,52 @@
 
 import Foundation
 
-struct MemoryGame<CardContent> {
+struct MemoryGame<CardContent: Equatable> {
     var cards: Array<Card>
     
-    func choose(card: Card) {
-        print(card)
+    var indexFaceUpCard: Int? {
+        get {
+            var faceUpCardIndices = [Int]()
+            for i in cards.indices {
+                if cards[i].isFaceUp {
+                    faceUpCardIndices.append(i)
+                }
+            }
+            
+            if faceUpCardIndices.count == 1 {
+                return faceUpCardIndices.first
+            }
+            return nil
+        }
+        set {
+            for i in cards.indices {
+                if i == newValue {
+                    cards[i].isFaceUp = true
+                } else {
+                    cards[i].isFaceUp = false
+                }
+            }
+        }
     }
     
+    mutating func choose(card: Card) {
+        if let chosenIndex = self.cards.firstIndex(matching: card), !cards[chosenIndex].isFaceUp && !cards[chosenIndex].isMatched {
+            if let potentialMatchIndex = indexFaceUpCard {
+                if self.cards[chosenIndex].content == self.cards[potentialMatchIndex].content {
+                    self.cards[chosenIndex].isMatched = true
+                    self.cards[potentialMatchIndex].isMatched = true
+                }
+                self.indexFaceUpCard = nil
+            } else {
+                for i in cards.indices {
+                    cards[i].isFaceUp = false
+                }
+                self.indexFaceUpCard = chosenIndex
+            }
+            self.cards[chosenIndex].isFaceUp = true
+        }
+    }
+
     init(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
         cards = Array<Card>()
 
@@ -26,7 +65,7 @@ struct MemoryGame<CardContent> {
     }
     
     struct Card: Identifiable {
-        var isFaceUp: Bool = true
+        var isFaceUp: Bool = false
         var isMatched: Bool = false
         var content: CardContent
         var id: Int
