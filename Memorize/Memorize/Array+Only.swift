@@ -9,7 +9,7 @@
 import Foundation
 
 extension Array {
-    var only: Element? {
+    var only: Element? { // Util function to get only element in array
         count == 1 ? first : nil
     }
 }

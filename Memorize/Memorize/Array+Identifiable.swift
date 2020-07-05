@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Array where Element: Identifiable {
+extension Array where Element: Identifiable { // Util function to get first Index of identifiable element
     func firstIndex(matching element: Element) -> Int? {
         for i in self.indices {
             if (element.id == self[i].id) {

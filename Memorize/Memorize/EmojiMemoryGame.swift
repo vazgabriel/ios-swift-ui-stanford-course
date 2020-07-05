@@ -8,28 +8,37 @@
 
 import SwiftUI
 
-class EmojiMemoryGame: ObservableObject {
-    @Published private var model: MemoryGame<String> = EmojiMemoryGame.createMemoryGame()
+let pairsOfCards = 6
 
-    static func createMemoryGame() -> MemoryGame<String> {
-        let emojis = ["👻", "🎃", "🕷", "💀", "👽"]
-        let pairs = Int.random(in: 2...5)
-        return MemoryGame<String>(numberOfPairsOfCards: pairs) { i in emojis[i] }
-    }
-    
-    init() {
-        model.cards.shuffle()
-    }
+// Themes for game (it's necessary to have 6 pairs of card or changing pairsOfCards )
+let EMOJI_GAME_THEMES: [String:Array<String>] = [
+    "Halloween": ["👻", "🎃", "🕷", "💀", "👽", "🧛"],
+    "Faces": ["😀", "😛", "😂", "🥰", "🤩", "🥺"],
+    "Hands": ["🖖", "👉", "👈", "👊", "💪", "👌"],
+]
+
+class EmojiMemoryGame: ObservableObject {
+    @Published private var model: MemoryGame<String> = MemoryGame<String>()
 
     // MARK: - Access to the Model
 
     var cards: Array<MemoryGame<String>.Card> {
         model.cards
     }
+
+    var score: Int {
+        model.score
+    }
     
     // MARK: - Intent(s)
     
     func choose(card: MemoryGame<String>.Card) {
         model.choose(card: card)
+    }
+    
+    func startGame(_ theme: String) {
+        if let emojis = EMOJI_GAME_THEMES[theme] {
+            self.model.startGame(numberOfPairsOfCards: pairsOfCards) { i in emojis[i] }
+        }
     }
 }
